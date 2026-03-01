@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.env
+.prisma/
+*.local
+.vscode
+
+# AI assistanted related stuff
+PLAN.md
+claude.md
+
