@@ -5,9 +5,11 @@ dist/
 *.local
 .vscode
 .DS_Store
+
 # AI assisted related stuff
 PLAN.md
 CLAUDE.md
 
+#firebase key
 serviceAccount.json
 
