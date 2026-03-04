@@ -11,6 +11,25 @@ export class RoundsService {
     private readonly applicationsService: ApplicationsService,
   ) {}
 
+  async findByApplication(userId: string, applicationId: string) {
+    await this.applicationsService.findOwned(userId, applicationId);
+    return this.prisma.interviewRound.findMany({
+      where: { applicationId },
+      orderBy: { createdAt: "asc" },
+    });
+  }
+
+  async findOne(userId: string, id: string) {
+    const round = await this.prisma.interviewRound.findUnique({
+      where: { id },
+      include: { application: true, questions: true },
+    });
+    if (!round || round.application.userId !== userId) {
+      throw new NotFoundException();
+    }
+    return round;
+  }
+
   async create(userId: string, applicationId: string, dto: CreateRoundDto) {
     await this.applicationsService.findOwned(userId, applicationId);
     return this.prisma.interviewRound.create({

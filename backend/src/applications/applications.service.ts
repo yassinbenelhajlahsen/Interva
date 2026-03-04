@@ -14,6 +14,10 @@ export class ApplicationsService {
     });
   }
 
+  findOne(userId: string, id: string) {
+    return this.findOwned(userId, id);
+  }
+
   create(userId: string, dto: CreateApplicationDto) {
     return this.prisma.application.create({
       data: { ...dto, userId },

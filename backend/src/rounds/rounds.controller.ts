@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   HttpCode,
   Param,
   Patch,
@@ -16,6 +17,19 @@ import { UpdateRoundDto } from "./dto/update-round.dto";
 @Controller()
 export class RoundsController {
   constructor(private readonly roundsService: RoundsService) {}
+
+  @Get("applications/:applicationId/rounds")
+  findByApplication(
+    @CurrentUser() user: User,
+    @Param("applicationId") applicationId: string,
+  ) {
+    return this.roundsService.findByApplication(user.id, applicationId);
+  }
+
+  @Get("rounds/:id")
+  findOne(@CurrentUser() user: User, @Param("id") id: string) {
+    return this.roundsService.findOne(user.id, id);
+  }
 
   @Post("applications/:applicationId/rounds")
   create(

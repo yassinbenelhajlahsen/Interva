@@ -23,6 +23,11 @@ export class ApplicationsController {
     return this.applicationsService.findAll(user.id);
   }
 
+  @Get(":id")
+  findOne(@CurrentUser() user: User, @Param("id") id: string) {
+    return this.applicationsService.findOne(user.id, id);
+  }
+
   @Post()
   create(@CurrentUser() user: User, @Body() dto: CreateApplicationDto) {
     return this.applicationsService.create(user.id, dto);
