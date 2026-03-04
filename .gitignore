@@ -5,7 +5,7 @@ dist/
 *.local
 .vscode
 
-# AI assistanted related stuff
+# AI assisted related stuff
 PLAN.md
-claude.md
+CLAUDE.md
 
