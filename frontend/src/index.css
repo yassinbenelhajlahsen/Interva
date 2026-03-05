@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -43,10 +44,29 @@
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-ring: var(--sidebar-ring);
+
+    /* App semantic tokens */
+    --color-app-bg: var(--app-bg);
+    --color-app-text-primary: var(--app-text-primary);
+    --color-app-text-secondary: var(--app-text-secondary);
+    --color-app-text-tertiary: var(--app-text-tertiary);
+    --color-app-brand: var(--app-brand);
+    --color-app-brand-light: var(--app-brand-light);
+    --color-app-border: var(--app-border);
+    --color-app-border-subtle: var(--app-border-subtle);
+    --color-app-surface: var(--app-surface);
+    --color-app-surface-secondary: var(--app-surface-secondary);
+    --color-app-surface-hover: var(--app-surface-hover);
+    --color-app-input-bg: var(--app-input-bg);
+
+    /* Shadow scale — usable as shadow-surface, shadow-surface-hover, shadow-sheet */
+    --shadow-surface: var(--card-shadow);
+    --shadow-surface-hover: var(--card-shadow-hover);
+    --shadow-sheet: var(--sheet-shadow);
 }
 
 :root {
-    --radius: 0.625rem;
+    --radius: 0.75rem;
     --background: oklch(1 0 0);
     --foreground: oklch(0.145 0 0);
     --card: oklch(1 0 0);
@@ -78,6 +98,25 @@
     --sidebar-accent-foreground: oklch(0.205 0 0);
     --sidebar-border: oklch(0.922 0 0);
     --sidebar-ring: oklch(0.708 0 0);
+
+    /* App semantic tokens — light */
+    --app-bg: #F2F2F5;
+    --app-text-primary: #1D1D1F;
+    --app-text-secondary: #6E6E73;
+    --app-text-tertiary: #AEAEB2;
+    --app-brand: #5184b4;
+    --app-brand-light: #EBF2FA;
+    --app-border: #E5E5EA;
+    --app-border-subtle: #D2D2D7;
+    --app-surface: #FFFFFF;
+    --app-surface-secondary: #F2F2F5;
+    --app-surface-hover: #F5F5F7;
+    --app-input-bg: #F5F5F7;
+
+    /* Shadow scale — light */
+    --card-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 6px 16px rgba(0,0,0,0.04);
+    --card-shadow-hover: 0 2px 8px rgba(0,0,0,0.07), 0 12px 28px rgba(0,0,0,0.08);
+    --sheet-shadow: 0 8px 32px rgba(0,0,0,0.10), 0 24px 56px rgba(0,0,0,0.10);
 }
 
 .dark {
@@ -112,13 +151,37 @@
     --sidebar-accent-foreground: oklch(0.985 0 0);
     --sidebar-border: oklch(1 0 0 / 10%);
     --sidebar-ring: oklch(0.556 0 0);
+
+    /* App semantic tokens — dark */
+    --app-bg: #0A0A0C;
+    --app-text-primary: #F5F5F7;
+    --app-text-secondary: #A1A1A6;
+    --app-text-tertiary: #6E6E73;
+    --app-brand: #6BA3D6;
+    --app-brand-light: #1A2A3A;
+    --app-border: rgba(255,255,255,0.08);
+    --app-border-subtle: rgba(255,255,255,0.05);
+    --app-surface: #1C1C1E;
+    --app-surface-secondary: #2C2C2E;
+    --app-surface-hover: #252527;
+    --app-input-bg: #242426;
+
+    /* Shadow scale — dark */
+    --card-shadow: 0 1px 3px rgba(0,0,0,0.4), 0 6px 16px rgba(0,0,0,0.25);
+    --card-shadow-hover: 0 2px 10px rgba(0,0,0,0.5), 0 14px 32px rgba(0,0,0,0.35);
+    --sheet-shadow: 0 8px 40px rgba(0,0,0,0.6), 0 24px 64px rgba(0,0,0,0.5);
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
-    }
+  }
   body {
     @apply bg-background text-foreground;
-    }
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
 }

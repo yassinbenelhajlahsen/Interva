@@ -20,10 +20,10 @@ type FloatingInputProps = {
   disabled?: boolean;
   className?: string;
   error?: string;
-  // Visual customizations (optional)
-  focusColor?: string; // color used for border / ring on focus (hex)
-  borderColor?: string; // default border color (hex)
-  labelColor?: string; // optional override for the floating label color
+  // Visual customizations (optional — CSS variable names preferred)
+  focusColor?: string;
+  borderColor?: string;
+  labelColor?: string;
 };
 
 export function FloatingInput({
@@ -45,8 +45,8 @@ export function FloatingInput({
   disabled = false,
   className = "",
   error,
-  focusColor = "#F7DEE2",
-  borderColor = "#F0F0F0",
+  focusColor = "var(--app-brand)",
+  borderColor = "var(--app-border)",
   labelColor,
 }: FloatingInputProps) {
   const isPasswordLabel = label?.toLowerCase() === "password";
@@ -55,7 +55,7 @@ export function FloatingInput({
   return (
     <div className={`relative ${className}`}>
       {leftIcon && (
-        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#888] pointer-events-none z-10">
+        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-app-text-secondary pointer-events-none z-10">
           {leftIcon}
         </div>
       )}
@@ -76,21 +76,22 @@ export function FloatingInput({
         disabled={disabled}
         className={`peer w-full ${leftIcon ? "pl-10" : "pl-4"} ${
           rightSlot ? "pr-10" : "pr-4"
-        } pt-6 pb-3 bg-white border-2 rounded-xl shadow-sm transition-all duration-200 text-[#333]`}
+        } pt-6 pb-3 rounded-xl transition-all duration-200`}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
-        // Inline styles used to ensure consistent color removal of native focus UI
         style={{
           borderColor: error ? "#ef4444" : isFocused ? focusColor : borderColor,
+          borderWidth: '1.5px',
+          borderStyle: 'solid',
+          backgroundColor: 'var(--app-input-bg)',
           outline: "none",
           WebkitAppearance: "none",
           appearance: "none",
-          // Prevent native blue text-fill on autofill in WebKit
-          WebkitTextFillColor: "#333",
-          color: "#333",
-          // show a faint ring using boxShadow when focused (keeps component accessible)
+          color: "var(--app-text-primary)",
+          WebkitTextFillColor: "var(--app-text-primary)",
+          fontSize: '15px',
           boxShadow: isFocused
-            ? `0 0 0 4px ${focusColor}33` // 20% alpha
+            ? `0 0 0 3px color-mix(in srgb, ${focusColor} 12%, transparent)`
             : undefined,
         }}
       />
@@ -103,8 +104,8 @@ export function FloatingInput({
             error
               ? "text-red-500 peer-focus:text-red-500"
               : `${
-                  isPasswordLabel ? "text-[#5184b4]" : "text-[#888]"
-                } peer-focus:text-[#5184b4]`
+                  isPasswordLabel ? "text-app-brand" : "text-app-text-secondary"
+                } peer-focus:text-app-brand`
           }
           peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-sm
           peer-focus:top-2 peer-focus:translate-y-0 peer-focus:text-xs
@@ -117,7 +118,6 @@ export function FloatingInput({
           color: error ? "#ef4444" : labelColor ? labelColor : undefined,
         }}
       >
-        {/* Render label text and style a trailing '*' red when present */}
         {label?.endsWith("*") ? (
           <>
             {label.slice(0, -1).trimEnd()}{" "}

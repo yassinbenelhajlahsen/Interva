@@ -30,8 +30,8 @@ export function DeleteConfirmDialog({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent className="rounded-2xl sm:max-w-sm">
         <AlertDialogHeader>
-          <AlertDialogTitle className="text-[#1a1a1a]">{title}</AlertDialogTitle>
-          <AlertDialogDescription className="text-[#888]">
+          <AlertDialogTitle className="text-app-text-primary">{title}</AlertDialogTitle>
+          <AlertDialogDescription className="text-app-text-secondary">
             {description}
           </AlertDialogDescription>
         </AlertDialogHeader>
