@@ -18,6 +18,8 @@ import {
 import { Textarea } from '@/components/ui/textarea'
 import { FloatingInput } from '@/components/ui/FloatingInput'
 import { Plus, Trash2, Briefcase, Calendar } from 'lucide-react'
+import { Skeleton } from '@/components/ui/Skeleton'
+import { DeleteConfirmDialog } from '@/components/DeleteConfirmDialog'
 
 type ApplicationStatus = 'APPLIED' | 'INTERVIEWING' | 'OFFER' | 'REJECTED' | 'ACCEPTED'
 
@@ -56,6 +58,8 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [deleteId, setDeleteId] = useState<string | null>(null)
+  const [deleting, setDeleting] = useState(false)
 
   const [company, setCompany] = useState('')
   const [role, setRole] = useState('')
@@ -95,17 +99,40 @@ export default function Dashboard() {
     }
   }
 
-  async function handleDelete(e: React.MouseEvent, id: string) {
-    e.stopPropagation()
-    if (!window.confirm('Delete this application?')) return
-    await api.delete(`/applications/${id}`)
-    setApplications((prev) => prev.filter((a) => a.id !== id))
+  async function handleDelete() {
+    if (!deleteId) return
+    setDeleting(true)
+    try {
+      await api.delete(`/applications/${deleteId}`)
+      setApplications((prev) => prev.filter((a) => a.id !== deleteId))
+      setDeleteId(null)
+    } finally {
+      setDeleting(false)
+    }
   }
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-24">
-        <div className="w-6 h-6 border-2 border-[#5184b4] border-t-transparent rounded-full animate-spin" />
+      <div>
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <Skeleton className="h-7 w-36 mb-2" />
+            <Skeleton className="h-4 w-24" />
+          </div>
+          <Skeleton className="h-10 w-40 rounded-xl" />
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="bg-white rounded-2xl border border-[#f0f0f0] p-5">
+              <Skeleton className="h-5 w-3/4 mb-2" />
+              <Skeleton className="h-4 w-1/2 mb-4" />
+              <div className="flex items-center justify-between">
+                <Skeleton className="h-5 w-20 rounded-full" />
+                <Skeleton className="h-4 w-16" />
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     )
   }
@@ -148,7 +175,7 @@ export default function Dashboard() {
             className="bg-white rounded-2xl border border-[#f0f0f0] p-5 cursor-pointer hover:border-[#5184b4]/30 hover:shadow-md transition-all duration-200 group relative"
           >
             <button
-              onClick={(e) => handleDelete(e, app.id)}
+              onClick={(e) => { e.stopPropagation(); setDeleteId(app.id) }}
               className="absolute top-4 right-4 p-1.5 rounded-lg text-[#ccc] hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-all duration-150"
             >
               <Trash2 size={14} />
@@ -167,6 +194,16 @@ export default function Dashboard() {
           </div>
         ))}
       </div>
+
+      {/* Delete confirm dialog */}
+      <DeleteConfirmDialog
+        open={!!deleteId}
+        onOpenChange={(open) => { if (!open) setDeleteId(null) }}
+        title="Delete application?"
+        description="This will permanently delete the application and all its interview rounds and questions."
+        onConfirm={handleDelete}
+        loading={deleting}
+      />
 
       {/* Create dialog */}
       <Dialog open={dialogOpen} onOpenChange={(open) => { setDialogOpen(open); if (!open) resetForm() }}>

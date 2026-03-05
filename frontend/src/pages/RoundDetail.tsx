@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { FloatingInput } from '@/components/ui/FloatingInput'
 import { ArrowLeft, Sparkles, MessageSquare } from 'lucide-react'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 interface Application {
   id: string
@@ -97,8 +98,29 @@ export default function RoundDetail() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-24">
-        <div className="w-6 h-6 border-2 border-[#5184b4] border-t-transparent rounded-full animate-spin" />
+      <div className="max-w-2xl mx-auto">
+        <Skeleton className="h-4 w-48 mb-1" />
+        <Skeleton className="h-8 w-56 mb-6 mt-2" />
+        <div className="bg-white rounded-2xl border border-[#f0f0f0] p-6 mb-6">
+          <Skeleton className="h-5 w-32 mb-5" />
+          <div className="space-y-4">
+            <Skeleton className="h-14 rounded-xl" />
+            <Skeleton className="h-14 rounded-xl" />
+            <Skeleton className="h-24 rounded-xl" />
+            <Skeleton className="h-14 rounded-xl" />
+          </div>
+        </div>
+        <div className="bg-white rounded-2xl border border-[#f0f0f0] p-6">
+          <div className="flex items-center justify-between mb-5">
+            <Skeleton className="h-5 w-40" />
+            <Skeleton className="h-9 w-28 rounded-xl" />
+          </div>
+          <div className="space-y-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton key={i} className="h-14 rounded-xl" />
+            ))}
+          </div>
+        </div>
       </div>
     )
   }

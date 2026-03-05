@@ -18,6 +18,8 @@ import {
 import { Textarea } from '@/components/ui/textarea'
 import { FloatingInput } from '@/components/ui/FloatingInput'
 import { ArrowLeft, Plus, Trash2, ChevronRight, Calendar, Layers } from 'lucide-react'
+import { Skeleton } from '@/components/ui/Skeleton'
+import { DeleteConfirmDialog } from '@/components/DeleteConfirmDialog'
 
 type ApplicationStatus = 'APPLIED' | 'INTERVIEWING' | 'OFFER' | 'REJECTED' | 'ACCEPTED'
 
@@ -77,6 +79,8 @@ export default function ApplicationDetail() {
   const [roundNotes, setRoundNotes] = useState('')
   const [roundOutcome, setRoundOutcome] = useState('')
   const [addingRound, setAddingRound] = useState(false)
+  const [deleteRoundId, setDeleteRoundId] = useState<string | null>(null)
+  const [deletingRound, setDeletingRound] = useState(false)
 
   useEffect(() => {
     if (!id) return
@@ -140,17 +144,42 @@ export default function ApplicationDetail() {
     }
   }
 
-  async function handleDeleteRound(e: React.MouseEvent, roundId: string) {
-    e.stopPropagation()
-    if (!window.confirm('Delete this round?')) return
-    await api.delete(`/rounds/${roundId}`)
-    setRounds((prev) => prev.filter((r) => r.id !== roundId))
+  async function handleDeleteRound() {
+    if (!deleteRoundId) return
+    setDeletingRound(true)
+    try {
+      await api.delete(`/rounds/${deleteRoundId}`)
+      setRounds((prev) => prev.filter((r) => r.id !== deleteRoundId))
+      setDeleteRoundId(null)
+    } finally {
+      setDeletingRound(false)
+    }
   }
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-24">
-        <div className="w-6 h-6 border-2 border-[#5184b4] border-t-transparent rounded-full animate-spin" />
+      <div className="max-w-2xl mx-auto">
+        <Skeleton className="h-4 w-32 mb-6" />
+        <div className="bg-white rounded-2xl border border-[#f0f0f0] p-6 mb-6">
+          <Skeleton className="h-5 w-44 mb-5" />
+          <div className="space-y-4">
+            <Skeleton className="h-14 rounded-xl" />
+            <Skeleton className="h-14 rounded-xl" />
+            <Skeleton className="h-12 rounded-xl" />
+            <Skeleton className="h-28 rounded-xl" />
+          </div>
+        </div>
+        <div className="bg-white rounded-2xl border border-[#f0f0f0] p-6">
+          <div className="flex items-center justify-between mb-5">
+            <Skeleton className="h-5 w-40" />
+            <Skeleton className="h-9 w-28 rounded-xl" />
+          </div>
+          <div className="space-y-3">
+            {Array.from({ length: 2 }).map((_, i) => (
+              <Skeleton key={i} className="h-16 rounded-xl" />
+            ))}
+          </div>
+        </div>
       </div>
     )
   }
@@ -269,7 +298,7 @@ export default function ApplicationDetail() {
                 </div>
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={(e) => handleDeleteRound(e, round.id)}
+                    onClick={(e) => { e.stopPropagation(); setDeleteRoundId(round.id) }}
                     className="p-1.5 rounded-lg text-[#ccc] hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-all duration-150"
                   >
                     <Trash2 size={13} />
@@ -281,6 +310,16 @@ export default function ApplicationDetail() {
           </div>
         )}
       </div>
+
+      {/* Delete round confirm dialog */}
+      <DeleteConfirmDialog
+        open={!!deleteRoundId}
+        onOpenChange={(open) => { if (!open) setDeleteRoundId(null) }}
+        title="Delete round?"
+        description="This will permanently delete the interview round and any generated questions."
+        onConfirm={handleDeleteRound}
+        loading={deletingRound}
+      />
 
       {/* Add Round dialog */}
       <Dialog open={roundDialogOpen} onOpenChange={(open) => { setRoundDialogOpen(open); if (!open) resetRoundForm() }}>
