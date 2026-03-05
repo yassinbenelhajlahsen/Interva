@@ -3,8 +3,40 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/contexts/auth-context'
 import { FloatingInput } from '@/components/ui/FloatingInput'
 import { Button } from '@/components/ui/button'
+import { Check } from 'lucide-react'
 
 type Mode = 'signin' | 'signup'
+
+const FIREBASE_ERRORS: Record<string, string> = {
+  'auth/user-not-found': 'No account found with this email.',
+  'auth/invalid-credential': 'Incorrect email or password.',
+  'auth/wrong-password': 'Incorrect password.',
+  'auth/email-already-in-use': 'An account with this email already exists.',
+  'auth/invalid-email': 'Please enter a valid email address.',
+  'auth/weak-password': 'Password must be at least 6 characters.',
+  'auth/too-many-requests': 'Too many failed attempts. Please try again later.',
+  'auth/popup-closed-by-user': '',
+  'auth/cancelled-popup-request': '',
+  'auth/network-request-failed': 'Network error. Check your connection.',
+}
+
+function parseFirebaseError(err: unknown): string {
+  if (!(err instanceof Error)) return 'Something went wrong.'
+  const code = (err as { code?: string }).code ?? ''
+  return FIREBASE_ERRORS[code] ?? err.message.replace('Firebase: ', '').replace(/\(auth\/.*\)\.?/, '').trim()
+}
+
+interface PasswordRule {
+  label: string
+  test: (pw: string) => boolean
+}
+
+const PASSWORD_RULES: PasswordRule[] = [
+  { label: 'At least 8 characters', test: (pw) => pw.length >= 8 },
+  { label: 'One uppercase letter', test: (pw) => /[A-Z]/.test(pw) },
+  { label: 'One lowercase letter', test: (pw) => /[a-z]/.test(pw) },
+  { label: 'One number', test: (pw) => /[0-9]/.test(pw) },
+]
 
 export default function LoginPage() {
   const [mode, setMode] = useState<Mode>('signin')
@@ -16,9 +48,13 @@ export default function LoginPage() {
   const { signIn, signUp, signInWithGoogle } = useAuth()
   const navigate = useNavigate()
 
+  const passwordMet = PASSWORD_RULES.map((r) => r.test(password))
+  const allMet = passwordMet.every(Boolean)
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError('')
+    if (mode === 'signup' && !allMet) return
     setLoading(true)
     try {
       if (mode === 'signin') {
@@ -28,8 +64,7 @@ export default function LoginPage() {
       }
       navigate('/', { replace: true })
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Something went wrong'
-      setError(msg.replace('Firebase: ', '').replace(/\(auth\/.*\)\.?/, '').trim())
+      setError(parseFirebaseError(err))
     } finally {
       setLoading(false)
     }
@@ -42,8 +77,8 @@ export default function LoginPage() {
       await signInWithGoogle()
       navigate('/', { replace: true })
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Something went wrong'
-      setError(msg.replace('Firebase: ', '').replace(/\(auth\/.*\)\.?/, '').trim())
+      const msg = parseFirebaseError(err)
+      if (msg) setError(msg)
     } finally {
       setGoogleLoading(false)
     }
@@ -127,8 +162,30 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               autoComplete={mode === 'signin' ? 'current-password' : 'new-password'}
-              minLength={6}
             />
+
+            {/* Password requirements (signup only) */}
+            {mode === 'signup' && password.length > 0 && (
+              <ul className="space-y-1.5 pt-1">
+                {PASSWORD_RULES.map((rule, i) => (
+                  <li
+                    key={rule.label}
+                    className="flex items-center gap-2 text-xs transition-colors duration-200"
+                    style={{ color: passwordMet[i] ? '#22c55e' : '#aaa' }}
+                  >
+                    <span
+                      className="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-200"
+                      style={{
+                        backgroundColor: passwordMet[i] ? '#22c55e' : '#f0f0f0',
+                      }}
+                    >
+                      {passwordMet[i] && <Check size={10} strokeWidth={3} color="white" />}
+                    </span>
+                    {rule.label}
+                  </li>
+                ))}
+              </ul>
+            )}
 
             {error && (
               <p className="text-sm text-red-500 bg-red-50 rounded-lg px-3 py-2">{error}</p>
@@ -136,7 +193,7 @@ export default function LoginPage() {
 
             <Button
               type="submit"
-              disabled={loading}
+              disabled={loading || (mode === 'signup' && password.length > 0 && !allMet)}
               className="w-full mt-2 h-11 text-sm font-medium rounded-xl"
               style={{ backgroundColor: '#5184b4' }}
             >
