@@ -207,50 +207,52 @@ export default function Dashboard() {
 
       {/* Create dialog */}
       <Dialog open={dialogOpen} onOpenChange={(open) => { setDialogOpen(open); if (!open) resetForm() }}>
-        <DialogContent className="sm:max-w-md rounded-2xl">
+        <DialogContent className="sm:max-w-md rounded-2xl flex flex-col max-h-[90vh]">
           <DialogHeader>
             <DialogTitle className="text-lg font-semibold text-[#1a1a1a]">New Application</DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleCreate} className="space-y-4 mt-2">
-            <FloatingInput
-              id="new-company"
-              type="text"
-              label="Company *"
-              value={company}
-              onChange={(e) => setCompany(e.target.value)}
-            />
-            <FloatingInput
-              id="new-role"
-              type="text"
-              label="Role *"
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-            />
-            <div>
-              <label className="text-xs text-[#888] mb-1.5 block">Status</label>
-              <Select value={status} onValueChange={(v) => setStatus(v as ApplicationStatus)}>
-                <SelectTrigger className="rounded-xl border-[#f0f0f0] border-2 h-12">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {STATUS_OPTIONS.map((s) => (
-                    <SelectItem key={s} value={s}>
-                      {s.charAt(0) + s.slice(1).toLowerCase()}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <label className="text-xs text-[#888] mb-1.5 block">Job Description</label>
-              <Textarea
-                value={jobDescription}
-                onChange={(e) => setJobDescription(e.target.value)}
-                placeholder="Paste the job description…"
-                className="rounded-xl border-[#f0f0f0] border-2 min-h-[100px] resize-none"
+          <form onSubmit={handleCreate} className="flex flex-col flex-1 min-h-0 mt-2">
+            <div className="space-y-4 overflow-y-auto flex-1 min-h-0 pr-0.5">
+              <FloatingInput
+                id="new-company"
+                type="text"
+                label="Company *"
+                value={company}
+                onChange={(e) => setCompany(e.target.value)}
               />
+              <FloatingInput
+                id="new-role"
+                type="text"
+                label="Role *"
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+              />
+              <div>
+                <label className="text-xs text-[#888] mb-1.5 block">Status</label>
+                <Select value={status} onValueChange={(v) => setStatus(v as ApplicationStatus)}>
+                  <SelectTrigger className="rounded-xl border-[#f0f0f0] border-2 h-12">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {STATUS_OPTIONS.map((s) => (
+                      <SelectItem key={s} value={s}>
+                        {s.charAt(0) + s.slice(1).toLowerCase()}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="text-xs text-[#888] mb-1.5 block">Job Description</label>
+                <Textarea
+                  value={jobDescription}
+                  onChange={(e) => setJobDescription(e.target.value)}
+                  placeholder="Paste the job description…"
+                  className="rounded-xl border-[#f0f0f0] border-2 min-h-[100px] resize-none"
+                />
+              </div>
             </div>
-            <div className="flex gap-3 pt-2">
+            <div className="flex gap-3 pt-4">
               <Button
                 type="button"
                 variant="ghost"
