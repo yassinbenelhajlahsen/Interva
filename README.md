@@ -1,105 +1,115 @@
 # Interva
 
-AI-powered interview tracking application.
+AI-powered interview tracking app. Manage job applications, track interview rounds, and generate AI-based questions per round.
 
-A fullstack web app that allows users to track job applications, manage interview rounds, and generate AI-based interview questions.
-
----
-
-## Tech Stack
-
-### Frontend
-- React (TypeScript)/Vite
-- Firebase Authentication
-- Tailwind CSS
-
-### Backend
-- NestJS (TypeScript)
-- Node.js
-- PostgreSQL
-- Prisma ORM
-- Firebase Admin SDK (token validation)
+**Stack:** React + Vite · NestJS · PostgreSQL · Prisma · Firebase Auth · OpenAI
 
 ---
 
-## Features
+## Setup
 
-- Email/password authentication via Firebase
-- Server-side Firebase ID token validation
-- CRUD for job applications
-- CRUD for interview rounds
-- AI-generated interview questions per round
-- All data scoped to authenticated user
+### Prerequisites
+
+- Node.js 18+
+- PostgreSQL running locally (or a connection string)
+- Firebase project with **Email/Password** and **Google** sign-in enabled
+- OpenAI API key
+
+### 1. Clone & install
+
+```bash
+git clone <repo-url>
+cd Interva
+npm install
+```
+
+### 2. Configure environment
+
+Copy the example and fill in your values:
+
+```bash
+cp .env.example .env
+```
+
+**Backend** (`backend/.env` or root `.env`):
+
+| Variable | Where to find it |
+|---|---|
+| `DATABASE_URL` | Your PostgreSQL connection string |
+| `FIREBASE_PROJECT_ID` | Firebase Console → Project Settings |
+| `FIREBASE_CLIENT_EMAIL` | Firebase Console → Service Accounts → Generate new private key |
+| `FIREBASE_PRIVATE_KEY` | Same JSON file — paste the `private_key` value |
+| `OPENAI_API_KEY` | platform.openai.com → API keys |
+
+**Frontend** (`frontend/.env`):
+
+| Variable | Where to find it |
+|---|---|
+| `VITE_FIREBASE_API_KEY` | Firebase Console → Project Settings → Your apps → Web app config |
+| `VITE_FIREBASE_AUTH_DOMAIN` | Same location |
+| `VITE_FIREBASE_PROJECT_ID` | Same location |
+
+### 3. Set up the database
+
+```bash
+npm run db:migrate
+```
+
+### 4. Run
+
+```bash
+npm run dev
+```
+
+Opens:
+- Frontend: http://localhost:5173
+- Backend API: http://localhost:3000
 
 ---
 
-## Authentication Flow
+## Firebase setup checklist
 
-1. User signs in with Firebase on the frontend.
-2. Firebase issues an ID token.
-3. Frontend sends requests with:
-
-   Authorization: Bearer <ID_TOKEN>
-
-4. NestJS verifies the token using Firebase Admin SDK.
-5. Protected routes reject invalid or missing tokens.
-
-Passwords are not stored in PostgreSQL.
+1. Create a project at [console.firebase.google.com](https://console.firebase.google.com)
+2. **Authentication → Sign-in method**: enable **Email/Password** and **Google**
+3. **Project Settings → Service Accounts**: generate a new private key and paste the values into your `.env`
+4. **Project Settings → Your apps**: add a Web app and copy the config into `frontend/.env`
 
 ---
 
-## Core Entities
-
-### User
-- id
-- firebaseUid
-- email
-
-### Application
-- id
-- userId
-- company
-- role
-- status
-- jobDescription
-
-### InterviewRound
-- id
-- applicationId
-- roundType
-- date
-- notes
-- outcome
-
-### GeneratedQuestion
-- id
-- interviewRoundId
-- questionText
-
----
-
-## Sample API Routes
+## API Reference
 
 ### Applications
-GET /applications  
-POST /applications  
-PATCH /applications/:id  
-DELETE /applications/:id  
+| Method | Path | Description |
+|---|---|---|
+| GET | `/applications` | List all applications |
+| GET | `/applications/:id` | Get single application |
+| POST | `/applications` | Create application |
+| PATCH | `/applications/:id` | Update application |
+| DELETE | `/applications/:id` | Delete application |
 
 ### Interview Rounds
-POST /applications/:id/rounds  
-PATCH /rounds/:id  
-DELETE /rounds/:id  
+| Method | Path | Description |
+|---|---|---|
+| GET | `/applications/:id/rounds` | List rounds for an application |
+| GET | `/rounds/:id` | Get single round (includes questions) |
+| POST | `/applications/:id/rounds` | Create round |
+| PATCH | `/rounds/:id` | Update round |
+| DELETE | `/rounds/:id` | Delete round |
 
 ### AI
-POST /rounds/:id/generate-questions  
+| Method | Path | Description |
+|---|---|---|
+| POST | `/rounds/:id/generate-questions` | Generate 5 interview questions via OpenAI |
+
+All routes require `Authorization: Bearer <Firebase ID Token>`.
 
 ---
 
-## Project Goals
+## Data model
 
-- Demonstrate a complete fullstack application
-- Implement secure backend token validation
-- Design relational database models
-- Build structured REST APIs
-- Integrate AI into a real workflow
+```
+User
+ └── Application (company, role, status, jobDescription)
+      └── InterviewRound (roundType, date, notes, outcome)
+           └── GeneratedQuestion (questionText)
+```
