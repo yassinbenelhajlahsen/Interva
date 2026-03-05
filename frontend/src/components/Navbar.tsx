@@ -1,34 +1,52 @@
+import { Link } from 'react-router-dom'
 import { useAuth } from '@/contexts/auth-context'
-import { Button } from '@/components/ui/button'
-import { LogOut } from 'lucide-react'
+import { LogOut, Settings } from 'lucide-react'
+import { motion } from 'motion/react'
 
 export function Navbar() {
-  const { user, signOut } = useAuth()
+  const { signOut } = useAuth()
 
   return (
-    <header className="bg-white border-b border-[#f0f0f0] sticky top-0 z-50">
-      <div className="w-full px-6 h-16 flex items-center justify-between">
-        <span
-          className="text-xl font-semibold tracking-tight"
-          style={{ color: '#5184b4' }}
-        >
-          Interva
-        </span>
-        <div className="flex items-center gap-4">
-          <span className="text-sm text-[#888] hidden sm:block">
-            {user?.email}
-          </span>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={signOut}
-            className="text-[#888] hover:text-[#333] gap-2"
-          >
-            <LogOut size={15} />
-            <span className="hidden sm:inline">Sign out</span>
-          </Button>
+    <motion.header
+      initial={{ y: -8, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.25, ease: 'easeOut' }}
+      className="sticky top-0 z-50"
+    >
+      <div
+        className="bg-app-surface/70 backdrop-blur-2xl border-b border-app-border"
+        style={{ WebkitBackdropFilter: 'blur(24px)' }}
+      >
+        <div className="max-w-5xl mx-auto px-6 h-[52px] flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-2.5">
+            <div
+              className="w-[22px] h-[22px] rounded-[6px] flex items-center justify-center"
+              style={{ backgroundColor: '#F8CF26' }}
+            >
+              <span className="text-[10px] font-bold text-[#1A1A1A] leading-none">I</span>
+            </div>
+            <span className="text-[14px] font-semibold tracking-[-0.01em] text-app-text-primary">
+              Interva
+            </span>
+          </Link>
+
+          <div className="flex items-center gap-0.5">
+            <Link
+              to="/settings"
+              className="flex items-center justify-center w-8 h-8 rounded-xl text-app-text-tertiary hover:text-app-text-primary hover:bg-app-surface-hover transition-all duration-150"
+            >
+              <Settings size={15} />
+            </Link>
+            <button
+              onClick={signOut}
+              className="flex items-center gap-1.5 px-2.5 h-8 rounded-xl text-[13px] text-app-text-tertiary hover:text-app-text-primary hover:bg-app-surface-hover transition-all duration-150"
+            >
+              <LogOut size={14} />
+              <span className="hidden sm:inline font-medium">Sign out</span>
+            </button>
+          </div>
         </div>
       </div>
-    </header>
+    </motion.header>
   )
 }
